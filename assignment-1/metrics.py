@@ -16,7 +16,9 @@ def accuracy(y_hat, y):
     """
     assert(y_hat.size == y.size)
     # TODO: Write here
-    pass
+    print("accuracy")
+    return (y.hat == y).sum()/y.size
+
 
 def precision(y_hat, y, cls):
     """
@@ -29,7 +31,10 @@ def precision(y_hat, y, cls):
     Output:
     > Returns the precision as float
     """
-    pass
+    pred_pos = y_hat == cls
+    print("Pricision")
+    return y_hat[pred_pos] == y[pred_pos].sum()/pred_pos.size
+
 
 def recall(y_hat, y, cls):
     """
@@ -42,7 +47,9 @@ def recall(y_hat, y, cls):
     Output:
     > Returns the recall as float
     """
-    pass
+    act_pos = y == cls
+    return y_hat[act_pos] == y[act_pos].sum()/act_pos.size
+
 
 def rmse(y_hat, y):
     """
@@ -54,8 +61,9 @@ def rmse(y_hat, y):
     Output:
     > Returns the rmse as float
     """
+    print("Rmse")
+    return ((y-y_hat)**2).mean()**0.5
 
-    pass
 
 def mae(y_hat, y):
     """
@@ -67,4 +75,5 @@ def mae(y_hat, y):
     Output:
     > Returns the mae as float
     """
-    pass
+    print("Mae")
+    return abs(y-y_hat).mean()
