@@ -10,19 +10,140 @@ You will be expected to use this to make trees for:
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from .utils import entropy, information_gain, gini_index
+from .utils import information_gain, gini_gain, regression_impurity
 
 np.random.seed(42)
 
+
+class treenode():
+    def __init__(self, split_col=None, value=None):
+        self.value = value          # Leaf Value
+        self.split_col = split_col  # Attribute to bec checked
+        self.children = {}          # child nodes
+        self.prob = None            # For Attributes not present
+        self.mean = None            # For Real Attribute
+
+    def print_node(self, indent=0):
+        lookup = {"low": "<", "high": ">"}
+        if self.split_col != None:
+            for child in self.children:
+                if self.children[child].prob != None:
+                    print("  "*indent, "|?(X({}) = {}):".format(self.split_col, child))
+                else:
+                    print("  "*indent, "|?(X({}) {} {:.2f}):".format(self.split_col,
+                                                                     lookup[child], self.mean))
+                self.children[child].print_node(indent+1)
+        else:
+            if type(self.value) == str:
+                print("  "*indent, "|Value = {}".format(self.value))
+            else:
+                print("  "*indent, "|Value = {:.2f}".format(self.value))
+
+    def getVal(self, X):
+        if self.split_col == None:
+            return self.value
+        else:
+            if self.mean == None:
+                if X[self.split_col] in self.children:
+                    # When feature is already seen
+                    return self.children[X[self.split_col]].getVal(X.drop(self.split_col))
+                else:
+                    # When Feature is not in train class
+                    max_prob = 0
+                    child_name = None
+                    for child in self.children:
+                        if child.prob > max_prob:
+                            max_prob = child.prob
+                            child_name = child
+                    return child.getVal(X.drop(self.split_col))
+            else:
+                if X[self.split_col] <= self.mean:
+                    return self.children["low"].getVal(X)
+                else:
+                    return self.children["high"].getVal(X)
+
+
 class DecisionTree():
-    def __init__(self, criterion, max_depth):
+    def __init__(self, criterion, max_depth=100):
         """
         Put all infromation to initialize your tree here.
         Inputs:
-        > criterion : {"information_gain", "gini_index"} # criterion won't be used for regression
-        > max_depth : The maximum depth the tree can grow to 
+        # criterion won't be used for regression
+        > criterion : {"information_gain", "gini_index"}
+        > max_depth : The maximum depth the tree can grow to
         """
-        pass
+        self.criterion = criterion
+        self.max_depth = max_depth
+        self.root = None
+        self.Ydtype = None
+        self.colname = None
+
+    def create_tree(self, X, Y, parent_node, split_col=None, depth=0):
+        if Y.unique().size == 1:
+            return treenode(value=Y.values[0])
+
+        if len(X.columns) <= 0 or depth >= self.max_depth:
+            if str(Y.dtype) == 'category':
+                return treenode(value=Y.mode(dropna=True)[0])
+            else:
+                return treenode(value=Y.mean())
+
+        max_inf_gain = -np.inf
+        max_mean = None
+
+        for column in list(X.columns):
+            mean_val = None
+
+            if str(Y.dtype) == "category":
+                # for classification
+                if self.criterion == "information_gain":
+                    col_inf_gain = information_gain(Y, X[column])
+                elif self.criterion == "gini_index":
+                    col_inf_gain = gini_gain(Y, X[column])
+            else:
+                # for regression
+                col_inf_gain = regression_impurity(Y, X[column])
+
+            if type(col_inf_gain) == tuple:
+                # If attribute selected is range of values
+                mean_val = col_inf_gain[1]
+                col_inf_gain = col_inf_gain[0]
+
+            if col_inf_gain > max_inf_gain:
+                max_inf_gain = col_inf_gain
+                split_col = column
+                max_mean = mean_val
+
+        node = treenode(split_col=split_col)
+        parent_col = X[split_col]
+        if str(parent_col.dtype) == "category":
+            X = X.drop(split_col, axis=1)
+            split_col_classes = parent_col.groupby(parent_col).count()
+
+            for cat in list(split_col_classes.index):
+                sub_rows = parent_col == cat
+                if sub_rows.sum() > 0:
+                    node.children[cat] = self.create_tree(
+                        X[sub_rows],
+                        Y[sub_rows],
+                        node,
+                        depth=depth+1)
+                    node.children[cat].prob = X[sub_rows].size/X.size
+        else:
+            low_index = parent_col < max_mean
+            high_index = parent_col > max_mean
+            node.children["low"] = self.create_tree(
+                X[low_index],
+                Y[low_index],
+                node,
+                depth=depth+1)
+            node.children["high"] = self.create_tree(
+                X[high_index],
+                Y[high_index],
+                node,
+                depth=depth+1)
+            node.mean = max_mean
+        return node
 
     def fit(self, X, y):
         """
@@ -31,6 +152,10 @@ class DecisionTree():
         X: pd.DataFrame with rows as samples and columns as features (shape of X is N X P) where N is the number of samples and P is the number of columns.
         y: pd.Series with rows corresponding to output variable (shape of Y is N)
         """
+        self.Ydtype = y.dtype
+        self.colname = y.name
+        self.root = self.create_tree(X, y, None)
+
         pass
 
     def predict(self, X):
@@ -41,7 +166,11 @@ class DecisionTree():
         Output:
         y: pd.Series with rows corresponding to output variable. THe output variable in a row is the prediction for sample in corresponding row in X.
         """
-        pass
+        Y = []
+        for x in X.index:
+            Y.append(self.root.getVal(X.loc[x]))
+        return pd.Series(Y, name=self.colname).astype(self.Ydtype)
+        # pass
 
     def plot(self):
         """
@@ -55,4 +184,5 @@ class DecisionTree():
             N: Class C
         Where Y => Yes and N => No
         """
+        self.root.print_node(indent=0)
         pass
