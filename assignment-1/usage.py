@@ -16,7 +16,7 @@ from metrics import *
 np.random.seed(42)
 # Test case 1
 # Real Input and Real Output
-'''
+
 N = 30
 P = 5
 X = pd.DataFrame(np.random.randn(N, P))
@@ -32,7 +32,7 @@ for criteria in ['information_gain', 'gini_index']:
     print('Criteria :', criteria)
     print('RMSE: ', rmse(y_hat, y))
     print('MAE: ', mae(y_hat, y))
-'''
+
 # Test case 2
 # Real Input and Discrete Output
 
