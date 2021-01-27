@@ -7,6 +7,8 @@ from tqdm import tqdm
 
 np.random.seed(42)
 
+split = 0.7
+
 iris = pd.read_csv("assignment-1\iris.csv")
 iris["variety"] = iris["variety"].astype("category")
 
@@ -14,12 +16,11 @@ shuffled = iris.sample(frac=1).reset_index(drop=True)
 
 X = shuffled.iloc[:, :-1].squeeze()
 y = (shuffled.iloc[:, -1:]).T.squeeze()
-
 len_iris = len(y)
 
-X_train, y_train = X.loc[:0.7*len_iris], y.loc[:0.7*len_iris]
-X_test, y_test = X.loc[0.7*len_iris+1:].reset_index(
-    drop=True), y.loc[0.7*len_iris+1:].reset_index(drop=True)
+X_train, y_train = X.loc[:split*len_iris], y.loc[:split*len_iris]
+X_test, y_test = X.loc[split*len_iris+1:].reset_index(
+    drop=True), y.loc[split*len_iris+1:].reset_index(drop=True)
 
 
 tree = DecisionTree(criterion="information_gain")
