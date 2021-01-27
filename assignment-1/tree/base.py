@@ -16,12 +16,13 @@ np.random.seed(42)
 
 
 class treenode():
-    def __init__(self, split_col=None, value=None):
+    def __init__(self, split_col=None, value=None, depth=None):
         self.value = value          # Leaf Value
         self.split_col = split_col  # Attribute to bec checked
         self.children = {}          # child nodes
         self.prob = None            # For Attributes not present
         self.mean = None            # For Real Attribute
+        self.depth = depth
 
     def print_node(self, indent=0):
         lookup = {"low": "<", "high": ">"}
@@ -35,18 +36,20 @@ class treenode():
                 self.children[child].print_node(indent+1)
         else:
             if type(self.value) == str:
-                print("  "*indent, "|Value = {}".format(self.value))
+                print("  "*indent,
+                      "|Value = {} Depth = {}".format(self.value, self.depth))
             else:
-                print("  "*indent, "|Value = {:.2f}".format(self.value))
+                print(
+                    "  "*indent, "|Value = {:.2f} Depth = {}".format(self.value, self.depth))
 
-    def getVal(self, X):
-        if self.split_col == None:
+    def getVal(self, X, max_depth=np.inf):
+        if self.split_col == None or self.depth >= max_depth:
             return self.value
         else:
             if self.mean == None:
                 if X[self.split_col] in self.children:
                     # When feature is already seen
-                    return self.children[X[self.split_col]].getVal(X.drop(self.split_col))
+                    return self.children[X[self.split_col]].getVal(X.drop(self.split_col), max_depth=max_depth)
                 else:
                     # When Feature is not in train class
                     max_prob = 0
@@ -55,16 +58,16 @@ class treenode():
                         if child.prob > max_prob:
                             max_prob = child.prob
                             child_name = child
-                    return child.getVal(X.drop(self.split_col))
+                    return child.getVal(X.drop(self.split_col), max_depth=max_depth)
             else:
                 if X[self.split_col] <= self.mean:
-                    return self.children["low"].getVal(X)
+                    return self.children["low"].getVal(X, max_depth=max_depth)
                 else:
-                    return self.children["high"].getVal(X)
+                    return self.children["high"].getVal(X, max_depth=max_depth)
 
 
 class DecisionTree():
-    def __init__(self, criterion, max_depth=100):
+    def __init__(self, criterion="information_gain", max_depth=100):
         """
         Put all infromation to initialize your tree here.
         Inputs:
@@ -80,13 +83,13 @@ class DecisionTree():
 
     def create_tree(self, X, Y, parent_node, split_col=None, depth=0):
         if Y.unique().size == 1:
-            return treenode(value=Y.values[0])
+            return treenode(value=Y.values[0], depth=depth)
 
         if len(X.columns) <= 0 or depth >= self.max_depth:
             if str(Y.dtype) == 'category':
-                return treenode(value=Y.mode(dropna=True)[0])
+                return treenode(value=Y.mode(dropna=True)[0], depth=depth)
             else:
-                return treenode(value=Y.mean())
+                return treenode(value=Y.mean(), depth=depth)
 
         max_inf_gain = -np.inf
         max_mean = None
@@ -137,12 +140,18 @@ class DecisionTree():
                 Y[low_index],
                 node,
                 depth=depth+1)
+
             node.children["high"] = self.create_tree(
                 X[high_index],
                 Y[high_index],
                 node,
                 depth=depth+1)
             node.mean = max_mean
+        if str(Y.dtype) == 'category':
+            node.value = Y.mode(dropna=True)[0]
+        else:
+            node.value = Y.mean()
+        node.depth = depth
         return node
 
     def fit(self, X, y):
@@ -158,7 +167,7 @@ class DecisionTree():
 
         pass
 
-    def predict(self, X):
+    def predict(self, X, max_depth=np.inf):
         """
         Funtion to run the decision tree on a data point
         Input:
@@ -168,7 +177,7 @@ class DecisionTree():
         """
         Y = []
         for x in X.index:
-            Y.append(self.root.getVal(X.loc[x]))
+            Y.append(self.root.getVal(X.loc[x], max_depth=max_depth))
         return pd.Series(Y, name=self.colname).astype(self.Ydtype)
         # pass
 
