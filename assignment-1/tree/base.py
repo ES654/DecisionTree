@@ -131,7 +131,8 @@ class DecisionTree():
                         Y[sub_rows],
                         node,
                         depth=depth+1)
-                    node.children[cat].prob = X[sub_rows].size/X.size
+                    node.children[cat].prob = len(X[sub_rows])/len(X)
+                    # node.children[cat].prob = X[sub_rows].size/X.size
         else:
             low_index = parent_col < max_mean
             high_index = parent_col > max_mean
