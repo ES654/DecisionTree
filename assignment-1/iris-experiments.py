@@ -9,7 +9,7 @@ np.random.seed(42)
 
 split = 0.7
 
-iris = pd.read_csv("assignment-1\iris.csv")
+iris = pd.read_csv("iris.csv")
 iris["variety"] = iris["variety"].astype("category")
 
 shuffled = iris.sample(frac=1).reset_index(drop=True)
@@ -35,8 +35,6 @@ for cls in y.unique():
 
 
 # Optimizing for depth
-
-
 def optimize_depth(X, y, folds=5, depths=[3, 4, 5, 6]):
     assert(len(X) == len(y))
     assert(len(X) > 0)

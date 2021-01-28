@@ -11,7 +11,7 @@ np.random.seed(42)
 max_depth = 5
 split = 0.7
 
-estate = pd.read_excel("assignment-1\Real estate valuation data set.xlsx")
+estate = pd.read_excel("Real estate valuation data set.xlsx")
 shuffled = estate.sample(frac=1).reset_index(drop=True)
 
 X = shuffled.iloc[:, :-1].squeeze()
