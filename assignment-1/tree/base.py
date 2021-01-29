@@ -68,7 +68,7 @@ class treenode():
 
 
 class DecisionTree():
-    def __init__(self, criterion="information_gain", max_depth=100):
+    def __init__(self, criterion="information_gain", max_depth=10):
         """
         Put all infromation to initialize your tree here.
         Inputs:
@@ -86,8 +86,10 @@ class DecisionTree():
     def create_tree(self, X, Y, parent_node, split_col=None, depth=0):
         if Y.unique().size == 1:
             return treenode(value=Y.values[0], depth=depth)
+        # if len(Y) == 0:
+        #     return None
 
-        if len(X.columns) <= 0 or depth >= self.max_depth:
+        if len(X.columns) <= 0 or depth >= self.max_depth or len(list(X.columns)) == sum(list(X.nunique())):
             if str(Y.dtype) == 'category':
                 return treenode(value=Y.mode(dropna=True)[0], depth=depth)
             else:
@@ -136,8 +138,8 @@ class DecisionTree():
                     node.children[cat].prob = len(X[sub_rows])/self.X_len
                     # node.children[cat].prob = X[sub_rows].size/X.size
         else:
-            low_index = parent_col < max_mean
-            high_index = parent_col > max_mean
+            low_index = parent_col <= max_mean
+            high_index = parent_col >= max_mean
             node.children["low"] = self.create_tree(
                 X[low_index],
                 Y[low_index],
