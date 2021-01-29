@@ -20,10 +20,10 @@ np.random.seed(42)
 N = 30
 P = 5
 X = pd.DataFrame(np.random.randn(N, P))
-y = pd.Series(np.random.randint(P, size = N), dtype="category")
+y = pd.Series(np.random.randint(P, size=N), dtype="category")
 
 for criteria in ['information_gain', 'gini_index']:
-    Classifier_RF = RandomForestClassifier(10, criterion = criteria)
+    Classifier_RF = RandomForestClassifier(3, criterion=criteria)
     Classifier_RF.fit(X, y)
     y_hat = Classifier_RF.predict(X)
     Classifier_RF.plot()
@@ -39,8 +39,9 @@ N = 30
 P = 5
 X = pd.DataFrame(np.random.randn(N, P))
 y = pd.Series(np.random.randn(N))
+criteria = "variance"
 
-Regressor_RF = RandomForestRegressor(10, criterion = criteria)
+Regressor_RF = RandomForestRegressor(3, criterion=criteria)
 Regressor_RF.fit(X, y)
 y_hat = Regressor_RF.predict(X)
 Regressor_RF.plot()

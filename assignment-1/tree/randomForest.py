@@ -1,15 +1,22 @@
 from .base import DecisionTree
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
 
 class RandomForestClassifier():
-    def __init__(self, n_estimators=100, criterion='gini', max_depth=None):
+    def __init__(self, n_estimators=100, criterion='gini', max_depth=100, max_attr=3):
         '''
         :param estimators: DecisionTree
         :param n_estimators: The number of trees in the forest.
         :param criterion: The function to measure the quality of a split.
         :param max_depth: The maximum depth of the tree.
         '''
-
-        pass
+        self.max_depth = max_depth
+        self.criterion = criterion
+        self.n_estimators = n_estimators
+        self.trees = []
+        self.max_attr = max_attr
 
     def fit(self, X, y):
         """
@@ -18,7 +25,12 @@ class RandomForestClassifier():
         X: pd.DataFrame with rows as samples and columns as features (shape of X is N X P) where N is the number of samples and P is the number of columns.
         y: pd.Series with rows corresponding to output variable (shape of Y is N)
         """
-        pass
+        for n in tqdm(range(self.n_estimators)):
+            X_sub = X.sample(n=self.max_attr, axis='columns')
+            tree = DecisionTree(criterion=self.criterion,
+                                max_depth=self.max_depth)
+            tree.fit(X_sub, y)
+            self.trees.append(tree)
 
     def predict(self, X):
         """
@@ -28,7 +40,13 @@ class RandomForestClassifier():
         Output:
         y: pd.Series with rows corresponding to output variable. THe output variable in a row is the prediction for sample in corresponding row in X.
         """
-        pass
+        y_hat_total = None
+        for i, tree in enumerate(self.trees):
+            if y_hat_total is No3ne:
+                y_hat_total = tree.predict(X).to_frame()
+            else:
+                y_hat_total[i] = tree.predict(X)
+        return y_hat_total.mode(axis=1)[0]
 
     def plot(self):
         """
@@ -43,19 +61,25 @@ class RandomForestClassifier():
         3. Creates a figure showing the combined decision surface
 
         """
-        pass
-
+        for i, tree in enumerate(self.trees):
+            print("-----------------------------")
+            print("Tree Number: {}".format(i+1))
+            print("-----------------------------")
+            tree.plot()
 
 
 class RandomForestRegressor():
-    def __init__(self, n_estimators=100, criterion='variance', max_depth=None):
+    def __init__(self, n_estimators=100, criterion='variance', max_depth=100, max_attr=3):
         '''
         :param n_estimators: The number of trees in the forest.
         :param criterion: The function to measure the quality of a split.
         :param max_depth: The maximum depth of the tree.
         '''
-
-        pass
+        self.max_depth = max_depth
+        self.criterion = criterion
+        self.n_estimators = n_estimators
+        self.trees = []
+        self.max_attr = max_attr
 
     def fit(self, X, y):
         """
@@ -64,7 +88,12 @@ class RandomForestRegressor():
         X: pd.DataFrame with rows as samples and columns as features (shape of X is N X P) where N is the number of samples and P is the number of columns.
         y: pd.Series with rows corresponding to output variable (shape of Y is N)
         """
-        pass
+        for n in tqdm(range(self.n_estimators)):
+            X_sub = X.sample(n=self.max_attr, axis='columns')
+            tree = DecisionTree(criterion=self.criterion,
+                                max_depth=self.max_depth)
+            tree.fit(X_sub, y)
+            self.trees.append(tree)
 
     def predict(self, X):
         """
@@ -74,7 +103,13 @@ class RandomForestRegressor():
         Output:
         y: pd.Series with rows corresponding to output variable. THe output variable in a row is the prediction for sample in corresponding row in X.
         """
-        pass
+        y_hat_total = None
+        for i, tree in enumerate(self.trees):
+            if y_hat_total is None:
+                y_hat_total = tree.predict(X).to_frame()
+            else:
+                y_hat_total[i] = tree.predict(X)
+        return y_hat_total.mean(axis=1)
 
     def plot(self):
         """
@@ -89,4 +124,8 @@ class RandomForestRegressor():
         3. Creates a figure showing the combined decision surface/prediction
 
         """
-        pass
+        for i, tree in enumerate(self.trees):
+            print("-----------------------------")
+            print("Tree Number: {}".format(i+1))
+            print("-----------------------------")
+            tree.plot()
