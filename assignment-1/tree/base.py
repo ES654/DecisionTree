@@ -29,18 +29,19 @@ class treenode():
         if self.split_col != None:
             for child in self.children:
                 if self.children[child].prob != None:
-                    print("  "*indent, "|?(X({}) = {}):".format(self.split_col, child))
+                    print("|  "*indent+"|?(X({}) = {}), NodeP[{:.2f}]:".format(
+                        self.split_col, child, self.children[child].prob))
                 else:
-                    print("  "*indent, "|?(X({}) {} {:.2f}):".format(self.split_col,
+                    print("|  "*indent+"|?(X({}) {} {:.2f}):".format(self.split_col,
                                                                      lookup[child], self.mean))
                 self.children[child].print_node(indent+1)
         else:
             if type(self.value) == str:
-                print("  "*indent,
-                      "|Value = {} Depth = {}".format(self.value, self.depth))
+                print("|  "*indent +
+                      "|--Value = {} Depth = {}".format(self.value, self.depth))
             else:
                 print(
-                    "  "*indent, "|Value = {:.2f} Depth = {}".format(self.value, self.depth))
+                    "|  "*indent + "|--Value = {:.2f} Depth = {}".format(self.value, self.depth))
 
     def getVal(self, X, max_depth=np.inf):
         if self.split_col == None or self.depth >= max_depth:
@@ -80,6 +81,7 @@ class DecisionTree():
         self.root = None
         self.Ydtype = None
         self.colname = None
+        self.X_len = None
 
     def create_tree(self, X, Y, parent_node, split_col=None, depth=0):
         if Y.unique().size == 1:
@@ -131,7 +133,7 @@ class DecisionTree():
                         Y[sub_rows],
                         node,
                         depth=depth+1)
-                    node.children[cat].prob = len(X[sub_rows])/len(X)
+                    node.children[cat].prob = len(X[sub_rows])/self.X_len
                     # node.children[cat].prob = X[sub_rows].size/X.size
         else:
             low_index = parent_col < max_mean
@@ -162,11 +164,11 @@ class DecisionTree():
         X: pd.DataFrame with rows as samples and columns as features (shape of X is N X P) where N is the number of samples and P is the number of columns.
         y: pd.Series with rows corresponding to output variable (shape of Y is N)
         """
+        self.X_len = len(X)
         self.Ydtype = y.dtype
         self.colname = y.name
         self.root = self.create_tree(X, y, None)
-
-        pass
+        self.root.prob = 1
 
     def predict(self, X, max_depth=np.inf):
         """
@@ -194,5 +196,4 @@ class DecisionTree():
             N: Class C
         Where Y => Yes and N => No
         """
-        self.root.print_node(indent=0)
-        pass
+        self.root.print_node()
