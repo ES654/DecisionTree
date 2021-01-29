@@ -9,8 +9,7 @@ from sklearn.utils.extmath import weighted_mode
 
 class BaggingClassifier():
     def __init__(self, base_estimator=DecisionTree, n_estimators=5,
-                 max_depth=100, criterion="information_gain",
-                 sample_r=0.7):
+                 max_depth=100, criterion="information_gain"):
         '''
         :param base_estimator: The base estimator model instance from which the bagged ensemble is built (e.g., DecisionTree(), LinearRegression()).
                                You can pass the object of the estimator class
@@ -22,7 +21,6 @@ class BaggingClassifier():
         self.n_estimators = n_estimators
         self.trees = []
         self.datas = []
-        self.sample_r = sample_r
 
     def fit(self, X, y):
         """

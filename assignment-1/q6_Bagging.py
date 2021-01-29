@@ -22,7 +22,7 @@ from sklearn.tree import DecisionTreeClassifier
 N = 50
 P = 2
 NUM_OP_CLASSES = 2
-n_estimators = 10
+n_estimators = 5
 X = pd.DataFrame(np.abs(np.random.randn(N, P)))
 y = pd.Series(np.random.randint(NUM_OP_CLASSES, size=N), dtype="category")
 
