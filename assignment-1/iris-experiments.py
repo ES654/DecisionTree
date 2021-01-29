@@ -73,4 +73,4 @@ def optimize_depth(X, y, folds=5, depths=[3, 4, 5, 6]):
     print("Optimum Depth = {}".format(accuracies.loc["mean"].idxmax()))
 
 
-optimize_depth(X, y, 4, [2, 3, 4, 5, 6, 7, 8, 10])
+optimize_depth(X, y, 5, list(range(3, 11)))
