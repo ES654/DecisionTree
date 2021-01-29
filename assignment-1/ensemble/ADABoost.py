@@ -1,14 +1,27 @@
+from sklearn.tree import DecisionTreeClassifier
+from tqdm import tqdm
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.utils.extmath import weighted_mode
+
 
 class AdaBoostClassifier():
-    def __init__(self, base_estimator, n_estimators=3): # Optional Arguments: Type of estimator
+    # Optional Arguments: Type of estimator
+    def __init__(self, base_estimator=DecisionTreeClassifier, n_estimators=5,
+                 max_depth=1, criterion="entropy"):
         '''
         :param base_estimator: The base estimator model instance from which the boosted ensemble is built (e.g., DecisionTree, LinearRegression).
                                If None, then the base estimator is DecisionTreeClassifier(max_depth=1).
                                You can pass the object of the estimator class
         :param n_estimators: The maximum number of estimators at which boosting is terminated. In case of perfect fit, the learning procedure may be stopped early.
         '''
-
-        pass
+        self.base_estimator = base_estimator
+        self.max_depth = max_depth
+        self.criterion = criterion
+        self.n_estimators = n_estimators
+        self.trees = []
+        self.alphas = []
 
     def fit(self, X, y):
         """
@@ -17,7 +30,28 @@ class AdaBoostClassifier():
         X: pd.DataFrame with rows as samples and columns as features (shape of X is N X P) where N is the number of samples and P is the number of columns.
         y: pd.Series with rows corresponding to output variable (shape of Y is N)
         """
-        pass
+        weights = np.ones(len(y))/len(y)
+        for n in tqdm(range(self.n_estimators)):
+            # Learning and Predicting
+            tree = self.base_estimator(
+                criterion=self.criterion, max_depth=self.max_depth)
+            tree.fit(X, y, sample_weight=weights)
+            y_hat = pd.Series(tree.predict(X))
+
+            # Calculating error and alpha
+            mis_idx = y_hat != y
+            err_m = np.sum(weights[mis_idx])/np.sum(weights)
+            alpha_m = 0.5*np.log((1-err_m)/err_m)
+
+            # Updating Weights
+            weights[mis_idx] *= np.exp(alpha_m)
+            weights[~mis_idx] *= np.exp(-alpha_m)
+            # Normalizing weights
+            weights /= np.sum(weights)
+
+            # Storing trees
+            self.trees.append(tree)
+            self.alphas.append(alpha_m)
 
     def predict(self, X):
         """
@@ -26,9 +60,17 @@ class AdaBoostClassifier():
         Output:
         y: pd.Series with rows corresponding to output variable. THe output variable in a row is the prediction for sample in corresponding row in X.
         """
-        pass
+        final = None
 
-    def plot(self):
+        for i, (alpha_m, tree) in enumerate(zip(self.alphas, self.trees)):
+            if final is None:
+                final = pd.Series(tree.predict(X))
+                final[0] *= alpha_m
+            else:
+                final += pd.Series(tree.predict(X))*alpha_m
+        return final.apply(np.sign)
+
+    def plot(self, X, y):
         """
         Function to plot the decision surface for AdaBoostClassifier for each estimator(iteration).
         Creates two figures
@@ -42,4 +84,60 @@ class AdaBoostClassifier():
 
         This function should return [fig1, fig2]
         """
-        pass
+        color = ["r", "b", "g"]
+        # ax1 = plt.figure(figsize=(len(self.trees)*5, 4))
+        Zs = None
+        fig1, ax1 = plt.subplots(
+            1, len(self.trees), figsize=(5*len(self.trees), 4))
+
+        x_min, x_max = X[0].min(), X[0].max()
+        y_min, y_max = X[1].min(), X[1].max()
+        x_range = x_max-x_min
+        y_range = y_max-y_min
+
+        for i, (alpha_m, tree) in enumerate(zip(self.alphas, self.trees)):
+            X_tree, y_tree = X, y
+
+            xx, yy = np.meshgrid(np.arange(x_min-0.2, x_max+0.2, (x_range)/50),
+                                 np.arange(y_min-0.2, y_max+0.2, (y_range)/50))
+
+            # _ = ax1.add_subplot(1, len(self.trees), i + 1)
+            ax1[i].set_ylabel("X2")
+            ax1[i].set_xlabel("X1")
+            Z = tree.predict(np.c_[xx.ravel(), yy.ravel()])
+            Z = Z.reshape(xx.shape)
+            if Zs is None:
+                Zs = alpha_m*Z
+            else:
+                Zs += alpha_m*Z
+            cs = ax1[i].contourf(xx, yy, Z, cmap=plt.cm.RdYlBu)
+
+            for y_label in y.unique():
+                idx = y_tree == y_label
+                id = list(y_tree.cat.categories).index(y_tree[idx].iloc[0])
+                ax1[i].scatter(X_tree.loc[idx, 0], X_tree.loc[idx, 1], c=color[id],
+                               cmap=plt.cm.RdYlBu, edgecolor='black', s=30,
+                               label="Class: "+str(y_label))
+            ax1[i].set_title("Decision Surface Tree: " + str(i+1))
+            ax1[i].legend()
+        fig1.tight_layout()
+
+        # For Common surface
+        fig2, ax2 = plt.subplots(1, 1, figsize=(5, 4))
+        com_surface = np.sign(Zs)
+        cs = ax2.contourf(xx, yy, com_surface, cmap=plt.cm.RdYlBu)
+        for y_label in y.unique():
+            idx = y == y_label
+            id = list(y.cat.categories).index(y[idx].iloc[0])
+            ax2.scatter(X.loc[idx, 0], X.loc[idx, 1], c=color[id],
+                        cmap=plt.cm.RdYlBu, edgecolor='black', s=30,
+                        label="Class: "+str(y_label))
+        ax2.set_ylabel("X2")
+        ax2.set_xlabel("X1")
+        ax2.legend(loc="lower right")
+        ax2.set_title("Common Decision Surface")
+
+        # Saving Figures
+        fig1.savefig("Q5_Fig1.png")
+        fig2.savefig("Q5_Fig2.png")
+        return fig1, fig2
