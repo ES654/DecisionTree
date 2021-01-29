@@ -12,24 +12,28 @@ from metrics import *
 
 from ensemble.bagging import BaggingClassifier
 from tree.base import DecisionTree
+
+from sklearn.tree import DecisionTreeClassifier
 # Or use sklearn decision tree
-from linearRegression.linearRegression import LinearRegression
+# from linearRegression.linearRegression import LinearRegression
 
 ########### BaggingClassifier ###################
 
-N = 30
+N = 50
 P = 2
 NUM_OP_CLASSES = 2
-n_estimators = 3
+n_estimators = 10
 X = pd.DataFrame(np.abs(np.random.randn(N, P)))
-y = pd.Series(np.random.randint(NUM_OP_CLASSES, size = N), dtype="category")
+y = pd.Series(np.random.randint(NUM_OP_CLASSES, size=N), dtype="category")
 
 criteria = 'information_gain'
-tree = DecisionTree(criterion=criteria)
-Classifier_B = BaggingClassifier(base_estimator=tree, n_estimators=n_estimators )
+tree = DecisionTreeClassifier
+Classifier_B = BaggingClassifier(
+    base_estimator=tree, n_estimators=n_estimators,
+    criterion="gini")
 Classifier_B.fit(X, y)
 y_hat = Classifier_B.predict(X)
-[fig1, fig2] = Classifier_B.plot()
+[fig1, fig2] = Classifier_B.plot(X, y)
 print('Criteria :', criteria)
 print('Accuracy: ', accuracy(y_hat, y))
 for cls in y.unique():
