@@ -26,7 +26,7 @@ for criteria in ['information_gain', 'gini_index']:
     Classifier_RF = RandomForestClassifier(3, criterion=criteria)
     Classifier_RF.fit(X, y)
     y_hat = Classifier_RF.predict(X)
-    Classifier_RF.plot()
+    Classifier_RF.plot(X, y)
     print('Criteria :', criteria)
     print('Accuracy: ', accuracy(y_hat, y))
     for cls in y.unique():
@@ -44,7 +44,7 @@ criteria = "variance"
 Regressor_RF = RandomForestRegressor(3, criterion=criteria)
 Regressor_RF.fit(X, y)
 y_hat = Regressor_RF.predict(X)
-Regressor_RF.plot()
+# Regressor_RF.plot()
 print('Criteria :', criteria)
 print('RMSE: ', rmse(y_hat, y))
 print('MAE: ', mae(y_hat, y))
