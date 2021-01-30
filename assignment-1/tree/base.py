@@ -118,7 +118,7 @@ class DecisionTree():
         self.colname = None                 # keeps track of all the column names in X data
         self.X_len = None                   # keeps track of len of X
 
-    def create_tree(self, X, Y, parent_node, depth=0):  # split_col=None
+    def create_tree(self, X, Y, parent_node, depth=0):
         '''
         This function recursively creates the tree.
         X: Features

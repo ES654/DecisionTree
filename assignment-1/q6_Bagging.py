@@ -39,3 +39,5 @@ print('Accuracy: ', accuracy(y_hat, y))
 for cls in y.unique():
     print('Precision: ', precision(y_hat, y, cls))
     print('Recall: ', recall(y_hat, y, cls))
+
+print("Plots saved as Q6_Fig1.png and Q6_Fig2.png")

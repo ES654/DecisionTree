@@ -30,12 +30,17 @@ class BaggingClassifier():
         y: pd.Series with rows corresponding to output variable (shape of Y is N)
         """
         for n in tqdm(range(self.n_estimators)):
+            # Sampling data
             X_sub = X.sample(frac=1, axis='rows', replace=True)
             y_sub = y[X_sub.index]
             X_sub = X_sub.reset_index(drop=True)
             y_sub = y_sub.reset_index(drop=True)
+
+            # Learning new tree on sampled data
             tree = self.base_estimator(criterion=self.criterion)
             tree.fit(X_sub, y_sub)
+
+            # Storing data and tree
             self.trees.append(tree)
             self.datas.append([X_sub, y_sub])
 
@@ -70,7 +75,6 @@ class BaggingClassifier():
 
         """
         color = ["r", "b", "g"]
-        # ax1 = plt.figure(figsize=(len(self.trees)*5, 4))
         Zs = []
         fig1, ax1 = plt.subplots(
             1, len(self.trees), figsize=(5*len(self.trees), 4))
@@ -86,13 +90,13 @@ class BaggingClassifier():
             xx, yy = np.meshgrid(np.arange(x_min-0.2, x_max+0.2, (x_range)/50),
                                  np.arange(y_min-0.2, y_max+0.2, (y_range)/50))
 
-            # _ = ax1.add_subplot(1, len(self.trees), i + 1)
             ax1[i].set_ylabel("X2")
             ax1[i].set_xlabel("X1")
             Z = tree.predict(np.c_[xx.ravel(), yy.ravel()])
             Z = Z.reshape(xx.shape)
             Zs.append(Z)
             cs = ax1[i].contourf(xx, yy, Z, cmap=plt.cm.RdYlBu)
+            fig1.colorbar(cs, ax=ax1[i], shrink=0.9)
 
             for y_label in y.unique():
                 idx = y_tree == y_label
@@ -119,6 +123,7 @@ class BaggingClassifier():
         ax2.set_xlabel("X1")
         ax2.legend()
         ax2.set_title("Common Decision Surface")
+        fig2.colorbar(cs, ax=ax2, shrink=0.9)
 
         # Saving Figures
         fig1.savefig("Q6_Fig1.png")

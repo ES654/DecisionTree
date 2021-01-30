@@ -7,22 +7,23 @@ from tqdm import tqdm
 
 np.random.seed(42)
 
-split = 0.7
+split = 0.7         # Split ratio
 
+# Loading and Preprocessing the data
 iris = pd.read_csv("iris.csv")
 iris["variety"] = iris["variety"].astype("category")
-
 shuffled = iris.sample(frac=1).reset_index(drop=True)
 
 X = shuffled.iloc[:, :-1].squeeze()
 y = (shuffled.iloc[:, -1:]).T.squeeze()
 len_iris = len(y)
 
+# Splitting the data
 X_train, y_train = X.loc[:split*len_iris], y.loc[:split*len_iris]
 X_test, y_test = X.loc[split*len_iris+1:].reset_index(
     drop=True), y.loc[split*len_iris+1:].reset_index(drop=True)
 
-
+# Learning the classifier
 tree = DecisionTree(criterion="information_gain")
 tree.fit(X_train, y_train)
 y_hat = tree.predict(X_test)
@@ -45,6 +46,7 @@ def optimize_depth(X, y, folds=5, depths=[3, 4, 5, 6]):
     chunk = int(len(X)//folds)
 
     for fold in tqdm(range(folds)):
+        # Trains a model for each fold
         indices = range(fold*chunk, (fold+1)*chunk)
         curr_fold = pd.Series([False for i in range(len(X))])
         curr_fold.loc[indices] = True
@@ -73,4 +75,5 @@ def optimize_depth(X, y, folds=5, depths=[3, 4, 5, 6]):
     print("Optimum Depth = {}".format(accuracies.loc["mean"].idxmax()))
 
 
-optimize_depth(X, y, 5, list(range(3, 11)))
+# Calling the function to optimize depth
+optimize_depth(X, y, folds=5, depths=list(range(3, 11)))

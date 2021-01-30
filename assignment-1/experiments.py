@@ -48,6 +48,14 @@ def datagen(N=30, M=5, io="dido"):
 
 
 def experiment(N=[30, ], M=[5, ], exp="sklearn", ios=["dido", ]):
+    '''
+    Creates a new experiment while varing one parameter, either M or 
+    N, exp can be sklearn or mine.
+    N: number of samples
+    M: number of attributes
+    exp: sklearn or mine
+    ios: list of input outputs, can be rido, dido, riro, diro
+    '''
     results = np.zeros((len(ios), len(N), len(M), 4))
 
     assert(len(N) == 1 or len(M) == 1)
@@ -129,8 +137,10 @@ def experiment(N=[30, ], M=[5, ], exp="sklearn", ios=["dido", ]):
 
 
 exps = ["dido", "diro", "rido", "riro"]
-results = {}
-sk_results = {}
+
+# Saves the plot in "exp" folder
+
+# Can be called in the folling ways -
 
 experiment(N=list(range(30, 81, 5)), ios=exps, exp="mine")
 # experiment(N=list(range(30, 81, 5)), ios=exps, exp="sklearn")

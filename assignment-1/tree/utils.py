@@ -19,7 +19,6 @@ def entropy(Y):
         p = classes.loc[cat]/Y.size
         if p > 0:
             S -= p*np.log2(p)
-            # print("Entropy: ", p*np.log2(p))
         else:
             pass
     return S
@@ -38,22 +37,23 @@ def information_gain(Y, attr):
     assert(Y.size == attr.size)
     assert(Y.size > 0)
 
-    # if str(attr.dtype) == "category":
     if str(attr.dtype) == "category":
+        # For Discrete Input
         gain = entropy(Y)
         for outlook in list(attr.unique()):
             Y_sub = Y[attr == outlook]
             if Y_sub.size > 0:
                 gain -= Y_sub.size/Y.size*entropy(Y_sub)
-        # print("Descrete Gain: ", gain)
 
     else:
+        # For Real Input
         sorted_attr = attr.sort_values()
         max_info = -np.inf
         value = None
         y_class = None
         low = sorted_attr.index[0]
 
+        # Finding best split for maximum information gain
         for high in sorted_attr.index[1:]:
             if Y[high] == y_class:
                 continue
@@ -93,21 +93,24 @@ def gini_index(Y):
 
 def gini_gain(Y, attr):
     gini_gain = 0
+
     if str(attr.dtype) == "category":
+        # For discrete input
         gain = gini_index(Y)
         for outlook in list(attr.unique()):
             Y_sub = Y[attr == outlook]
             if Y_sub.size > 0:
                 gain -= Y_sub.size/Y.size*gini_index(Y_sub)
-        # print("Descrete Gain: ", gain)
 
     else:
+        # For real input
         sorted_attr = attr.sort_values()
         max_info = -np.inf
         value = None
         y_class = None
         low = sorted_attr.index[0]
 
+        # Finding best split
         for high in sorted_attr.index[1:]:
             if Y[high] == y_class:
                 continue
@@ -134,12 +137,14 @@ def regression_impurity(Y, attr):
     assert(Y.size > 0)
 
     if str(attr.dtype) == "category":
+        # For discrete Input
         gain = np.var(Y)
         for outlook in list(attr.unique()):
             Y_sub = Y[attr == outlook]
             gain -= Y_sub.size/Y.size*np.var(Y_sub)
 
     else:
+        # For Real input
         sorted_attr = attr.sort_values()
         max_info = -np.inf
         value = None
@@ -156,7 +161,6 @@ def regression_impurity(Y, attr):
             if inf_gain > max_info:
                 value = mean_val
                 max_info = inf_gain
-                # print(max_info)
             low = high
         gain = (max_info, value)
     return gain

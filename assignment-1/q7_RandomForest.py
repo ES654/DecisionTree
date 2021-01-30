@@ -44,7 +44,7 @@ criteria = "variance"
 Regressor_RF = RandomForestRegressor(3, criterion=criteria)
 Regressor_RF.fit(X, y)
 y_hat = Regressor_RF.predict(X)
-# Regressor_RF.plot()
+Regressor_RF.plot()
 print('Criteria :', criteria)
 print('RMSE: ', rmse(y_hat, y))
 print('MAE: ', mae(y_hat, y))

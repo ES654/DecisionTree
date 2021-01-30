@@ -64,6 +64,7 @@ class AdaBoostClassifier():
         final = None
 
         for i, (alpha_m, tree) in enumerate(zip(self.alphas, self.trees)):
+            # looping for all learnt trees
             if final is None:
                 final = pd.Series(tree.predict(X))
                 final[0] *= alpha_m
@@ -88,7 +89,6 @@ class AdaBoostClassifier():
 
         assert(len(list(X.columns)) == 2)
         color = ["r", "b", "g"]
-        # ax1 = plt.figure(figsize=(len(self.trees)*5, 4))
         Zs = None
         fig1, ax1 = plt.subplots(
             1, len(self.trees), figsize=(5*len(self.trees), 4))
@@ -141,6 +141,7 @@ class AdaBoostClassifier():
         ax2.set_xlabel("X1")
         ax2.legend(loc="lower right")
         ax2.set_title("Common Decision Surface")
+        fig2.colorbar(cs, ax=ax2, shrink=0.9)
 
         # Saving Figures
         fig1.savefig("Q5_{}Fig1.png".format(name))

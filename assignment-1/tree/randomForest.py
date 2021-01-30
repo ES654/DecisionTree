@@ -15,11 +15,11 @@ class RandomForestClassifier():
         :param criterion: The function to measure the quality of a split.
         :param max_depth: The maximum depth of the tree.
         '''
-        self.max_depth = max_depth
-        self.criterion = criterion
-        self.n_estimators = n_estimators
-        self.trees = []
-        self.max_attr = max_attr
+        self.max_depth = max_depth              # max depth for each tree
+        self.criterion = criterion              # criterion for the trees
+        self.n_estimators = n_estimators        # number of trees
+        self.trees = []                         # array stroing the trees
+        self.max_attr = max_attr                # max cols to select together
 
     def fit(self, X, y):
         """
@@ -29,11 +29,16 @@ class RandomForestClassifier():
         y: pd.Series with rows corresponding to output variable (shape of Y is N)
         """
         for n in tqdm(range(self.n_estimators)):
+            # Sampling columns
             X_sub = X.sample(n=np.random.randint(
                 1, self.max_attr + 1), axis='columns')
+
+            # Leaning data
             tree = DecisionTree(criterion=self.criterion,
                                 max_depth=self.max_depth)
             tree.fit(X_sub, y)
+
+            # Storing learnt tree
             self.trees.append(tree)
 
     def predict(self, X):
@@ -65,16 +70,18 @@ class RandomForestClassifier():
         3. Creates a figure showing the combined decision surface
 
         """
-
+        # Print normal text tree
         for i, tree in enumerate(self.trees):
             print("-----------------------------")
             print("Tree Number: {}".format(i+1))
             print("-----------------------------")
             tree.plot()
         if db:
+            # returns plot if specified
             return self.decisionBoundary(X, y)
 
     def decisionBoundary(self, X, y):
+        # function to return plots
         assert(len(list(X.columns)) == 2)
 
         color = ["r", "y", "b"]
@@ -96,8 +103,10 @@ class RandomForestClassifier():
             Z = np.vectorize(lambda x: lookup[x])(Z)
             Z = Z.reshape(xx.shape)
             cs = ax1[i].contourf(xx, yy, Z, cmap=plt.cm.RdYlBu)
+            fig1.colorbar(cs, ax=ax1[i], shrink=0.9)
             ax1[i].set_ylabel("X2")
             ax1[i].set_xlabel("X1")
+
             Zs.append(Z)
             for y_label in y.unique():
                 idx = y == y_label
@@ -109,7 +118,7 @@ class RandomForestClassifier():
             ax1[i].legend()
         fig1.tight_layout()
 
-        fig2, ax2 = plt.subplots(1, 1, figsize=(5, 4))
+        fig2, ax2 = plt.subplots(1, 1, figsize=(6, 4))
         Zs = np.array(Zs)
         com_surface, _ = weighted_mode(Zs, np.ones(Zs.shape))
         Z = np.mean(Zs, axis=0)
@@ -124,6 +133,7 @@ class RandomForestClassifier():
         ax2.set_xlabel("X1")
         ax2.legend()
         ax2.set_title("Common Decision Surface")
+        fig2.colorbar(cs, ax=ax2, shrink=0.9)
 
         # Saving Figures
         fig1.savefig("Q7_Fig1.png")
