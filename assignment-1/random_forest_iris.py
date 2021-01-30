@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 from metrics import *
 
@@ -12,7 +13,7 @@ np.random.seed(42)
 split = 0.8         # Split Ratio
 
 # Loading data
-iris = pd.read_csv("iris.csv")
+iris = pd.read_csv(os.path.join("data", "iris.csv"))
 iris["variety"] = iris["variety"].astype("category")
 shuffled = iris.sample(frac=1).reset_index(drop=True)
 

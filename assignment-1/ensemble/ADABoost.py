@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.utils.extmath import weighted_mode
 from sklearn import tree as sktree
+import os
 
 
 class AdaBoostClassifier():
@@ -144,6 +145,6 @@ class AdaBoostClassifier():
         fig2.colorbar(cs, ax=ax2, shrink=0.9)
 
         # Saving Figures
-        fig1.savefig("Q5_{}Fig1.png".format(name))
-        fig2.savefig("Q5_{}Fig2.png".format(name))
+        fig1.savefig(os.path.join("figures", "Q5_{}Fig1.png".format(name)))
+        fig2.savefig(os.path.join("figures", "Q5_{}Fig2.png".format(name)))
         return fig1, fig2

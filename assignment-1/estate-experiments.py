@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 from tree.base import DecisionTree
 from metrics import rmse, mae
 from sklearn.tree import DecisionTreeRegressor
@@ -12,7 +13,8 @@ max_depth = 5       # Defining max_depth
 split = 0.7         # Split Ratio
 
 # Loading data
-estate = pd.read_excel("Real estate valuation data set.xlsx")
+estate = pd.read_excel(os.path.join(
+    "data", "Real estate valuation data set.xlsx"))
 shuffled = estate.sample(frac=1).reset_index(drop=True)
 
 # Preprocessing

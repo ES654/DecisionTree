@@ -4,13 +4,14 @@ import matplotlib.pyplot as plt
 from tree.base import DecisionTree
 from metrics import accuracy, precision, recall
 from tqdm import tqdm
+import os
 
 np.random.seed(42)
 
 split = 0.7         # Split ratio
 
 # Loading and Preprocessing the data
-iris = pd.read_csv("iris.csv")
+iris = pd.read_csv(os.path.join("data", "iris.csv"))
 iris["variety"] = iris["variety"].astype("category")
 shuffled = iris.sample(frac=1).reset_index(drop=True)
 

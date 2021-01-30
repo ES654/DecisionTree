@@ -110,7 +110,7 @@ def experiment(N=[30, ], M=[5, ], exp="sklearn", ios=["dido", ]):
             plt.xlabel("Varying M")
     plt.legend()
     plt.ylabel("Time taken in seconds")
-    plt.savefig(os.path.join("exp", "learn.png"))
+    plt.savefig(os.path.join(experiments, "learn.png"))
 
     # Ploting for Predicting tasks
     plt.figure()
@@ -132,13 +132,13 @@ def experiment(N=[30, ], M=[5, ], exp="sklearn", ios=["dido", ]):
             plt.xlabel("Varying M")
     plt.legend()
     plt.ylabel("Time taken in seconds")
-    plt.savefig(os.path.join("exp", "predict.png"))
+    plt.savefig(os.path.join(experiments, "predict.png"))
     return results
 
 
 exps = ["dido", "diro", "rido", "riro"]
 
-# Saves the plot in "exp" folder
+# Saves the plot in experiments folder
 
 # Can be called in the folling ways -
 

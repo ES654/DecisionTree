@@ -5,6 +5,7 @@ import pandas as pd
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from sklearn.utils.extmath import weighted_mode
+import os
 
 
 class RandomForestClassifier():
@@ -136,8 +137,8 @@ class RandomForestClassifier():
         fig2.colorbar(cs, ax=ax2, shrink=0.9)
 
         # Saving Figures
-        fig1.savefig("Q7_Fig1.png")
-        fig2.savefig("Q7_Fig2.png")
+        fig1.savefig(os.path.join("figures", "Q7_Fig1.png"))
+        fig2.savefig(os.path.join("figures", "Q7_Fig2.png"))
         return fig1, fig2
 
 

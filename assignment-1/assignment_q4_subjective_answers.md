@@ -15,13 +15,13 @@ For our decision tree, we obtain the following plots:
 #### Learning (Varying M)
 
 <p align="center">
-  <img width="400" src="exp/MyTree_MvsT_Learning.png">
+  <img width="400" src="experiments/MyTree_MvsT_Learning.png">
 </p>
 
 #### Prediction (Varying M)
 
 <p align="center">
-  <img width="400" src="exp/MyTree_MvsT_Prediction.png">
+  <img width="400" src="experiments/MyTree_MvsT_Prediction.png">
 </p>
 
 ### For Sklearn (Varying M)
@@ -29,13 +29,13 @@ For our decision tree, we obtain the following plots:
 #### Learning (Varying M)
 
 <p align="center">
-  <img width="400" src="exp/Sklearn_MvsT_Learning.png">
+  <img width="400" src="experiments/Sklearn_MvsT_Learning.png">
 </p>
 
 #### Prediction (Varying M)
 
 <p align="center">
-  <img width="400" src="exp/Sklearn_MvsT_Prediction.png">
+  <img width="400" src="experiments/Sklearn_MvsT_Prediction.png">
 </p>
 
 ### Discusion
@@ -55,13 +55,13 @@ For our decision tree, we obtain the following plots:
 #### Learning (Varying N)
 
 <p align="center">
-  <img width="400" src="exp/MyTree_NvsT_Learning.png">
+  <img width="400" src="experiments/MyTree_NvsT_Learning.png">
 </p>
 
 #### Prediction (Varying N)
 
 <p align="center">
-  <img width="400" src="exp/MyTree_NvsT_Prediction.png">
+  <img width="400" src="experiments/MyTree_NvsT_Prediction.png">
 </p>
 
 ### For Sklearn (Varying N)
@@ -69,13 +69,13 @@ For our decision tree, we obtain the following plots:
 #### Learning (Varying N)
 
 <p align="center">
-  <img width="400" src="exp/Sklearn_NvsT_Learning.png">
+  <img width="400" src="experiments/Sklearn_NvsT_Learning.png">
 </p>
 
 #### Prediction (Varying N)
 
 <p align="center">
-  <img width="400" src="exp/Sklearn_NvsT_Prediction.png">
+  <img width="400" src="experiments/Sklearn_NvsT_Prediction.png">
 </p>
 
 ### Discusion (Varying N)

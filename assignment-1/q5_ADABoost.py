@@ -7,6 +7,7 @@ The current code given is for the Assignment 2.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 from metrics import *
 
@@ -44,7 +45,7 @@ for cls in y.unique():
 # AdaBoostClassifier on Iris data set using the entire data set with sepal width and petal width as the two features
 split = 0.6
 
-iris = pd.read_csv("iris.csv")
+iris = pd.read_csv(os.path.join("data", "iris.csv"))
 iris["variety"] = iris["variety"].astype("category")
 shuffled = iris.sample(frac=1).reset_index(drop=True)
 

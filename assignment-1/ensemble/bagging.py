@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn import tree as sktree
 import matplotlib.pyplot as plt
 from sklearn.utils.extmath import weighted_mode
+import os
 
 
 class BaggingClassifier():
@@ -126,6 +127,6 @@ class BaggingClassifier():
         fig2.colorbar(cs, ax=ax2, shrink=0.9)
 
         # Saving Figures
-        fig1.savefig("Q6_Fig1.png")
-        fig2.savefig("Q6_Fig2.png")
+        fig1.savefig(os.path.join("figures", "Q6_Fig1.png"))
+        fig2.savefig(os.path.join("figures", "Q6_Fig2.png"))
         return fig1, fig2
