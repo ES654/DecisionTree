@@ -5,7 +5,7 @@
 ### Plots for 10 estimators
 
 <p align="center">
-  <img width="800" src="Q7_Fig1.png">
+  <img width="1200" src="Q7_Fig1.png">
 </p>
 
 ### Common Decision Boundary
