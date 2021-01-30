@@ -19,8 +19,6 @@ from sklearn.tree import DecisionTreeClassifier
 np.random.seed(42)
 
 ########### AdaBoostClassifier on Real Input and Discrete Output ###################
-
-
 N = 30
 P = 2
 NUM_OP_CLASSES = 2
@@ -28,7 +26,6 @@ n_estimators = 5
 X = pd.DataFrame(np.abs(np.random.randn(N, P)))
 y = pd.Series(np.random.randint(NUM_OP_CLASSES, size=N), dtype="category")
 y = y.cat.rename_categories([-1, 1])  # Changing 0 to -1 for adaboost
-
 
 criteria = 'entropy'
 tree = DecisionTreeClassifier
@@ -45,3 +42,32 @@ for cls in y.unique():
 
 
 # AdaBoostClassifier on Iris data set using the entire data set with sepal width and petal width as the two features
+split = 0.6
+
+iris = pd.read_csv("iris.csv")
+iris["variety"] = iris["variety"].astype("category")
+shuffled = iris.sample(frac=1).reset_index(drop=True)
+
+X = shuffled.iloc[:, :-1].squeeze()
+X = X[['sepal.width', "petal.width"]]
+y = (shuffled.iloc[:, -1:]).T.squeeze()
+y[y == "Setosa"] = "Versicolor"
+y = y.cat.remove_unused_categories()
+y = y.cat.rename_categories([-1, 1])
+
+len_iris = len(y)
+
+X_train, y_train = X.loc[:split*len_iris], y.loc[:split*len_iris]
+X_test, y_test = X.loc[split*len_iris+1:].reset_index(
+    drop=True), y.loc[split*len_iris+1:].reset_index(drop=True)
+
+tree = AdaBoostClassifier(n_estimators=3, criterion=criteria)
+tree.fit(X_train, y_train)
+y_hat = tree.predict(X_test)
+tree.plot(X, y, name="iris_")
+
+# Calculating Metrics
+print('Accuracy: ', accuracy(y_hat, y_test))
+for cls in y.unique():
+    print('Precision: ', precision(y_hat, y_test, cls))
+    print('Recall: ', recall(y_hat, y_test, cls))
