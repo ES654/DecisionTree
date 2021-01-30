@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.utils.extmath import weighted_mode
+from sklearn import tree as sktree
 
 
 class AdaBoostClassifier():
@@ -70,7 +71,7 @@ class AdaBoostClassifier():
                 final += pd.Series(tree.predict(X))*alpha_m
         return final.apply(np.sign)
 
-    def plot(self, X, y):
+    def plot(self, X, y, name=""):
         """
         Function to plot the decision surface for AdaBoostClassifier for each estimator(iteration).
         Creates two figures
@@ -84,20 +85,24 @@ class AdaBoostClassifier():
 
         This function should return [fig1, fig2]
         """
+
+        assert(len(list(X.columns)) == 2)
         color = ["r", "b", "g"]
         # ax1 = plt.figure(figsize=(len(self.trees)*5, 4))
         Zs = None
         fig1, ax1 = plt.subplots(
             1, len(self.trees), figsize=(5*len(self.trees), 4))
 
-        x_min, x_max = X[0].min(), X[0].max()
-        y_min, y_max = X[1].min(), X[1].max()
+        x_min, x_max = X.iloc[:, 0].min(), X.iloc[:, 0].max()
+        y_min, y_max = X.iloc[:, 1].min(), X.iloc[:, 1].max()
         x_range = x_max-x_min
         y_range = y_max-y_min
 
         for i, (alpha_m, tree) in enumerate(zip(self.alphas, self.trees)):
-            X_tree, y_tree = X, y
-
+            print("-----------------------------")
+            print("Tree Number: {}".format(i+1))
+            print("-----------------------------")
+            print(sktree.export_text(tree))
             xx, yy = np.meshgrid(np.arange(x_min-0.2, x_max+0.2, (x_range)/50),
                                  np.arange(y_min-0.2, y_max+0.2, (y_range)/50))
 
@@ -111,11 +116,11 @@ class AdaBoostClassifier():
             else:
                 Zs += alpha_m*Z
             cs = ax1[i].contourf(xx, yy, Z, cmap=plt.cm.RdYlBu)
-
+            fig1.colorbar(cs, ax=ax1[i], shrink=0.9)
             for y_label in y.unique():
-                idx = y_tree == y_label
-                id = list(y_tree.cat.categories).index(y_tree[idx].iloc[0])
-                ax1[i].scatter(X_tree.loc[idx, 0], X_tree.loc[idx, 1], c=color[id],
+                idx = y == y_label
+                id = list(y.cat.categories).index(y[idx].iloc[0])
+                ax1[i].scatter(X[idx].iloc[:, 0], X[idx].iloc[:, 1], c=color[id],
                                cmap=plt.cm.RdYlBu, edgecolor='black', s=30,
                                label="Class: "+str(y_label))
             ax1[i].set_title("Decision Surface Tree: " + str(i+1))
@@ -129,7 +134,7 @@ class AdaBoostClassifier():
         for y_label in y.unique():
             idx = y == y_label
             id = list(y.cat.categories).index(y[idx].iloc[0])
-            ax2.scatter(X.loc[idx, 0], X.loc[idx, 1], c=color[id],
+            ax2.scatter(X[idx].iloc[:, 0], X[idx].iloc[:, 1], c=color[id],
                         cmap=plt.cm.RdYlBu, edgecolor='black', s=30,
                         label="Class: "+str(y_label))
         ax2.set_ylabel("X2")
@@ -138,6 +143,6 @@ class AdaBoostClassifier():
         ax2.set_title("Common Decision Surface")
 
         # Saving Figures
-        fig1.savefig("Q5_Fig1.png")
-        fig2.savefig("Q5_Fig2.png")
+        fig1.savefig("Q5_{}Fig1.png".format(name))
+        fig2.savefig("Q5_{}Fig2.png".format(name))
         return fig1, fig2

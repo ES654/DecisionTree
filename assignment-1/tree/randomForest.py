@@ -77,8 +77,8 @@ class RandomForestClassifier():
     def decisionBoundary(self, X, y):
         assert(len(list(X.columns)) == 2)
 
-        color = ["r", "b", "g"]
-        lookup = {"Not Verginica": 0, "Virginica": 1}
+        color = ["r", "y", "b"]
+        lookup = {"Setosa": 0, "Versicolor": 1, "Virginica": 2}
         fig1, ax1 = plt.subplots(
             1, len(self.trees), figsize=(5*len(self.trees), 4))
 

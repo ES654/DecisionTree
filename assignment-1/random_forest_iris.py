@@ -21,9 +21,9 @@ shuffled = iris.sample(frac=1).reset_index(drop=True)
 X = shuffled.iloc[:, :-1].squeeze()
 X = X[['sepal.width', "petal.width"]]
 y = (shuffled.iloc[:, -1:]).T.squeeze()
-y[y == "Setosa"] = "Versicolor"
-y = y.cat.remove_unused_categories()
-y = y.cat.rename_categories(["Not Verginica", "Virginica"])
+# y[y == "Setosa"] = "Versicolor"
+# y = y.cat.remove_unused_categories()
+# y = y.cat.rename_categories(["Not Verginica", "Virginica"])
 
 len_iris = len(y)
 
